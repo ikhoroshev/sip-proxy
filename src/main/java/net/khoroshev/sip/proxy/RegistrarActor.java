@@ -29,7 +29,7 @@ public class RegistrarActor  extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(SIPRequest.class, r -> {
-            log.debug(String.format("<<%s", r.encode()));
+            log.debug(String.format("<<\n%s", r.encode()));
             if (Request.REGISTER.equals(r.getMethod())) {
                 //registrarDB.tell(new RegistrarDBActor.RegisterReq(r), getSelf());
                 Timeout timeout = new Timeout(Duration.create(5, "seconds"));
@@ -40,9 +40,9 @@ public class RegistrarActor  extends AbstractActor {
                 if (result.isSuccess()) {
                     SIPResponse response = r.createResponse(100);
                     messageChannel.tell(response, getSelf());
-                    log.debug(String.format(">>%s", response.encode()));
+                    log.debug(String.format(">>\n%s", response.encode()));
                     response = r.createResponse(200);
-                    log.debug(String.format(">>%s", response.encode()));
+                    log.debug(String.format(">>\n%s", response.encode()));
                     messageChannel.tell(response, getSelf());
                 } else {
                     //timeout

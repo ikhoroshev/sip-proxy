@@ -10,13 +10,18 @@ import gov.nist.javax.sip.message.SIPRequest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by sbt-khoroshev-iv on 25/05/17.
  */
-public class RegistrarDBActor extends AbstractActor {
+public class RegistrarDBActor extends AbstractActor /*TODO: AbstractPersistentActor*/   {
+    private static final int MAX_EXPIRES = 3600;
     LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     Map<String, ContactList> db = new HashMap<>();
+    Map<String, Long> expiresDb = new HashMap<>();
+
+    //TODO scheduled cleanup expired records
 
     /*@Override
     public String persistenceId() {
@@ -37,12 +42,26 @@ public class RegistrarDBActor extends AbstractActor {
             .match(RegisterReq.class,
                 r -> {
                     log.debug("<<");
-                    String addressOfRecord = r.getReq().getTo().getAddress().getURI().toString();
-                    ContactList contacts = r.getReq().getContactHeaders();
-                    db.put(addressOfRecord, contacts);
+                    register(r);
                     getSender().tell(new RegisterReq.Asc(true), getSelf());
                 })
             .build();
+    }
+
+    private void register(RegisterReq r) {
+        SIPRequest sipRequest = r.getReq();
+        String addressOfRecord = sipRequest.getTo().getAddress().getURI().toString();
+        ContactList contacts = sipRequest.getContactHeaders();
+        int expires = sipRequest.getExpires().getExpires();
+        if (expires > 0) {
+            expires = Math.min(expires, MAX_EXPIRES);
+            db.put(addressOfRecord, contacts);
+            expiresDb.put(addressOfRecord, System.currentTimeMillis() + expires * 1000);
+        } else {
+            db.remove(addressOfRecord);
+            expiresDb.remove(addressOfRecord);
+        }
+        db.put(addressOfRecord, contacts);
     }
 
     public static class RegisterReq{
