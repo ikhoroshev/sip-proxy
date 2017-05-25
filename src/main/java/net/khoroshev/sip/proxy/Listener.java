@@ -22,6 +22,7 @@ public class Listener extends AbstractActor {
     public static void main(String[] args) {
         ActorSystem system = ActorSystem.create("UDP_listener");
         system.registerOnTermination(()->{System.exit(0);});
+        system.actorOf(Props.create(RegistrarDBActor.class), "registrarDB");
         system.actorOf(Props.create(Listener.class, "0.0.0.0", 5060, null), "ul");
     }
 
@@ -84,7 +85,7 @@ public class Listener extends AbstractActor {
     private String nameByPacket(Udp.Received r) {
         InetAddress a = r.sender().getAddress();
         return new StringBuilder(
-                a.getHostAddress().replace('.', '_'))
+                Util.allowedPath(a.getHostAddress()))
                 .append('-')
                 .append(r.sender().getPort())
                 .toString();
