@@ -1,4 +1,4 @@
-package net.khoroshev.sip.proxy;
+package net.khoroshev.sip.proxy.deprecated;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -7,7 +7,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.message.SIPResponse;
 
 import javax.sip.message.Request;
 

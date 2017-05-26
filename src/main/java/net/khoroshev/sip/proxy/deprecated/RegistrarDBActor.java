@@ -1,4 +1,4 @@
-package net.khoroshev.sip.proxy;
+package net.khoroshev.sip.proxy.deprecated;
 
 import akka.actor.AbstractActor;
 import akka.event.Logging;

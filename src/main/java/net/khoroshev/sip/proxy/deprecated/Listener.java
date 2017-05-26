@@ -1,4 +1,4 @@
-package net.khoroshev.sip.proxy;
+package net.khoroshev.sip.proxy.deprecated;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -8,6 +8,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.io.Udp;
 import akka.io.UdpMessage;
+import net.khoroshev.sip.proxy.Util;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

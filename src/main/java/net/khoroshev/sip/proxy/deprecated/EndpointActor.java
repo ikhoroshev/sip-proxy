@@ -1,4 +1,4 @@
-package net.khoroshev.sip.proxy;
+package net.khoroshev.sip.proxy.deprecated;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -10,7 +10,6 @@ import akka.io.UdpMessage;
 import akka.util.ByteString;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.message.SIPResponse;
 import gov.nist.javax.sip.parser.StringMsgParser;
 
 import java.net.InetSocketAddress;
