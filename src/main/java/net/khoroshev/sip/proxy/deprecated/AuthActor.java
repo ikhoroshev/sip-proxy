@@ -7,7 +7,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.message.SIPRequest;
-import net.khoroshev.sip.proxy.deprecated.RegistrarActor;
+import net.khoroshev.sip.proxy.RegistrarActor;
 
 /**
  * Created by sbt-khoroshev-iv on 25/05/17.

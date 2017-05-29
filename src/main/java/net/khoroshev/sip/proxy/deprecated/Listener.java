@@ -8,6 +8,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.io.Udp;
 import akka.io.UdpMessage;
+import net.khoroshev.sip.proxy.RegistrarDBActor;
 import net.khoroshev.sip.proxy.Util;
 
 import java.net.InetAddress;

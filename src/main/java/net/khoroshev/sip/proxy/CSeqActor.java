@@ -1,4 +1,4 @@
-package net.khoroshev.sip.proxy.deprecated;
+package net.khoroshev.sip.proxy;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -42,5 +42,10 @@ public class CSeqActor extends AbstractActor {
             children = context().actorOf(Props.create(actorClass, messageChannel), name);
         }
         return children;
+    }
+
+    @Override
+    public void postStop() throws Exception {
+        log.debug("postStop()");
     }
 }

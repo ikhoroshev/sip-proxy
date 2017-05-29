@@ -6,6 +6,7 @@ import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import gov.nist.javax.sip.message.SIPMessage;
+import net.khoroshev.sip.proxy.CallIdActor;
 import net.khoroshev.sip.proxy.Util;
 
 /**

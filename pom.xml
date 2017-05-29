@@ -82,6 +82,36 @@
             <version>1.4.RC2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/io.kamon/kamon-jmx_2.10 -->
+        <dependency>
+            <groupId>io.kamon</groupId>
+            <artifactId>kamon-jmx_2.12</artifactId>
+            <version>0.6.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kamon</groupId>
+            <artifactId>kamon-akka-2.4_2.12</artifactId>
+            <version>0.6.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kamon</groupId>
+            <artifactId>kamon-system-metrics_2.12</artifactId>
+            <version>0.6.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.8.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.10</version>
+        </dependency>
+
+
+
     </dependencies>
     <properties>
         <akka.version>2.5.1</akka.version>
