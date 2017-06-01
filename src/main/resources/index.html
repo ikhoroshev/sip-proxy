@@ -1,0 +1,73 @@
+<html>
+<head>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="SIPml-api.js"></script>
+</head>
+<body>
+    <script>
+        function initSIPml(wsUri) {
+            SIPml.init(
+                function(e){
+                    var stack =  new SIPml.Stack({realm: 'example.org', impi: 'bob', impu: 'sip:bob@example.org', password: 'mysecret',
+                        websocket_proxy_url: wsUri,
+                        outbound_proxy_url: 'udp://example.org:5060',
+                        events_listener: { events: 'started', listener: function(e){
+                            var callSession = stack.newSession('call-audiovideo', {
+                                video_local: document.getElementById('video-local'), // <video id="video-local" .../>
+                                video_remote: document.getElementById('video-remote'), // <video id="video-remote" .../>
+                                audio_remote: document.getElementById('audio-remote') // <audio id="audio-remote" .../>
+                            });
+                            callSession.call('alice');
+                        }
+                        }
+                    });
+                    stack.start();
+                }
+            );
+        }
+        function initWs(wsUri) {
+            webSocket = new WebSocket(wsUri);
+
+            webSocket.onopen = function(event) {
+                //webSocket.send("Hello Web Socket!");
+                console.log('onopen, ' + event.data)
+            };
+
+            webSocket.onmessage = function(event) {
+                console.log('onmessage, ' + event.data)
+                $('#messages').prepend('<li>' + event.data + '</li>')
+            };
+
+            webSocket.onclose = function(event) {
+                console.log('Web Socket has been closed');
+                $('#wsConnectButton').prop( "disabled", false )
+            };
+        }
+        $( document ).ready(function() {
+            console.log( "ready!" );
+            var loc = window.location, new_uri;
+            if (loc.protocol === "https:") {
+                wsUri = "wss:";
+            } else {
+                wsUri = "ws:";
+            }
+            wsUri += "//" + loc.host;
+            sipmlUri = wsUri + "/sip"
+            wsUri += "/ws";
+            webSocket = null
+            //initWs(wsUri)
+            //initSIPml(sipmlUri);
+        });
+    </script>
+    <h1>Say hello to akka-http</h1>
+    <video id="video-local"></video>
+    <video id="video-remote"></video>
+    <audio id="audio-remote"></audio>
+
+    <input id="out" type="text" onchange="webSocket.send(this.value); this.value=''">
+    <input type="button" onclick="initSIPml(sipmlUri);" value="initSIPml(wsUri)">
+    <input id="wsConnectButton" type="button" onclick="initWs(wsUri); this.disabled=true;" value="connect to ws">
+    <ul id="messages"/>
+
+</body>
+</html>

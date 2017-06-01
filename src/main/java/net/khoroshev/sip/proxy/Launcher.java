@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory;
 import kamon.Kamon;
 import kamon.metric.instrument.Counter;
 import kamon.metric.instrument.Histogram;
-import net.khoroshev.sip.proxy.transport.HTTPTransport;
+import net.khoroshev.sip.proxy.transport.HTTPTransportJ;
 import net.khoroshev.sip.proxy.transport.UDPTransport;
 
 import java.util.ArrayList;
@@ -61,11 +61,7 @@ public class Launcher {
     private static ActorRef makeWsTransport(Config conf, ActorSystem system, List<ActorRef> sipSystems) {
         ActorRef result = null;
         if (conf.hasPath("websocket")) {
-            result = system.actorOf(Props.create(HTTPTransport.class
-                    , conf.getString("websocket.http.proto")
-                    , conf.getString("websocket.http.bindAddress")
-                    , conf.getInt("websocket.http.bindPort"), sipSystems)
-                    , conf.getString("websocket.name"));
+            result = HTTPTransportJ.getInstance(system, conf.getConfig("websocket"));
         }
         return result;
     }

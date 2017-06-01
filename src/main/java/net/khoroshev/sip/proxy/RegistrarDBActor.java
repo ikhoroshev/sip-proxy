@@ -38,7 +38,7 @@ public class RegistrarDBActor extends AbstractActor /*TODO: AbstractPersistentAc
                         String addressOfRecord = r.getAddressOfRecord();
                         log.debug(String.format("<<RmRegistrationReq for %s", addressOfRecord));
                         Long expired = expiresDb.get(addressOfRecord);
-                        if (expired < System.currentTimeMillis()) {
+                        if (expired!= null && expired < System.currentTimeMillis()) {
                             rm(addressOfRecord);
                             log.debug(String.format("<<RmRegistrationReq. Record %s has been removed from DB.", addressOfRecord));
                         } //else record updated
