@@ -73,7 +73,7 @@ public class HTTPTransportJ extends AbstractActor implements Transport{
                 path("hello", () ->
                         get(() ->
                                 complete("<h1>Say hello to akka-http</h1>"))),
-                path("ws", () -> this.<NotUsed>handleWebSocketMessagesForOptionalProtocol(sipFlow(), Optional.of("sip"))),
+                path("sip", () -> this.<NotUsed>handleWebSocketMessagesForOptionalProtocol(sipFlow(), Optional.of("sip"))),
 
                 /*entity(as[HttpRequest]) { requestData =>
                 complete {
@@ -85,7 +85,7 @@ public class HTTPTransportJ extends AbstractActor implements Transport{
                     val content = readFile(fullPath)
                     HttpResponse(StatusCodes.OK, entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`, content))
                 }*/
-                getFromResourceDirectory("")
+                getFromResourceDirectory("web")
             );
         }
 

@@ -122,7 +122,7 @@ class HTTPTransportS(implicit system: ActorSystem, conf: Config){
 
 
   def getDefaultPage: String = {
-    return "index.html"
+    return "web/index.html"
   }
 
   def sipFlow: Flow[Message, Message, Any] = {

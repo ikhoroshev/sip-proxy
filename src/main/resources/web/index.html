@@ -6,18 +6,31 @@
 <body>
     <script>
         function initSIPml(wsUri) {
+            var regSessionListener = function (e) {
+                console.log(e)
+            }
             SIPml.init(
                 function(e){
                     var stack =  new SIPml.Stack({realm: 'example.org', impi: 'bob', impu: 'sip:bob@example.org', password: 'mysecret',
                         websocket_proxy_url: wsUri,
-                        outbound_proxy_url: 'udp://example.org:5060',
+                        //outbound_proxy_url: 'udp://example.org:5060',
                         events_listener: { events: 'started', listener: function(e){
-                            var callSession = stack.newSession('call-audiovideo', {
+                            /*var callSession = stack.newSession('call-audiovideo', {
                                 video_local: document.getElementById('video-local'), // <video id="video-local" .../>
                                 video_remote: document.getElementById('video-remote'), // <video id="video-remote" .../>
                                 audio_remote: document.getElementById('audio-remote') // <audio id="audio-remote" .../>
                             });
-                            callSession.call('alice');
+                            callSession.call('alice');*/
+                            var regSession = stack.newSession('register', {
+                                expires: 200,
+                                events_listener: { events: '*', listener: regSessionListener },
+                                sip_caps: [
+                                    { name: '+g.oma.sip-im', value: null },
+                                    { name: '+audio', value: null },
+                                    { name: 'language', value: '\"en,fr\"' }
+                                ]
+                            });
+                            regSession.register();
                         }
                         }
                     });
