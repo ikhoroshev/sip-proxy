@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class RegistrarDBActor extends AbstractActor /*TODO: AbstractPersistentActor*/   {
     private final int maxExpires;
-    LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-    Map<String, ContactList> db = new HashMap<>();
-    Map<String, Long> expiresDb = new HashMap<>();
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+    private final Map<String, ContactList> db = new HashMap<>();
+    private final Map<String, Long> expiresDb = new HashMap<>();
 
     public RegistrarDBActor(int maxExpires) {
         this.maxExpires = maxExpires;
@@ -55,7 +55,7 @@ public class RegistrarDBActor extends AbstractActor /*TODO: AbstractPersistentAc
         SIPRequest sipRequest = r.getReq();
         String addressOfRecord = sipRequest.getTo().getAddress().getURI().toString();
         ContactList contacts = sipRequest.getContactHeaders();
-        int expires = sipRequest.getExpires().getExpires();
+        int expires = sipRequest.getExpires() == null ? Integer.MAX_VALUE : sipRequest.getExpires().getExpires();
         if (expires > 0) {
             expires = add(addressOfRecord, contacts, expires);
             getContext().getSystem().scheduler().scheduleOnce(
@@ -91,38 +91,38 @@ public class RegistrarDBActor extends AbstractActor /*TODO: AbstractPersistentAc
         return expires;
     }
 
-    public static class RegisterReq{
-        public SIPRequest getReq() {
+    static class RegisterReq{
+        SIPRequest getReq() {
             return req;
         }
 
         private final SIPRequest req;
 
-        public RegisterReq(SIPRequest req) {
+        RegisterReq(SIPRequest req) {
             this.req = req;
         }
-        public static class Asc{
+        static class Asc{
 
             private final int expires;
 
-            public int getExpires() {
+            int getExpires() {
                 return expires;
             }
 
-            public boolean isSuccess() {
+            boolean isSuccess() {
                 return success;
             }
 
             private final boolean success;
 
-            public Asc(boolean success, int expires) {
+            Asc(boolean success, int expires) {
                 this.success = success;
                 this.expires = expires;
             }
         }
     }
 
-    public static class RmRegistrationReq{
+    static class RmRegistrationReq{
         private final String addressOfRecord;
 
         public String getAddressOfRecord() {

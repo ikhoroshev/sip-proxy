@@ -2,6 +2,7 @@ package net.khoroshev.sip.proxy;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.PoisonPill;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -20,7 +21,9 @@ public class CallIdActor extends AbstractActor {
             String cSeqActorName = "CSeq-" + r.getCSeq().getSeqNumber() + "-" + r.getCSeq().getMethod();
             ActorRef cSeqActor = getCSeqActor(cSeqActorName);
             cSeqActor.tell(r, getSelf());
-        }).build();
+        })
+        .match(KillReq.class, m -> getSelf().tell(PoisonPill.getInstance(), getSelf()))
+        .build();
     }
 
     private ActorRef getCSeqActor(String name) {
@@ -31,4 +34,5 @@ public class CallIdActor extends AbstractActor {
         }
         return result;
     }
+    static class KillReq{}
 }

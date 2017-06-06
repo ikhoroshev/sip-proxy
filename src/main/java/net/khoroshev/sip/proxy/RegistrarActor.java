@@ -23,8 +23,8 @@ import javax.sip.message.Request;
  * Created by sbt-khoroshev-iv on 25/05/17.
  */
 public class RegistrarActor  extends AbstractActor {
-    LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-    final ActorRef messageChannel;
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+    private final ActorRef messageChannel;
     private ActorRef registrarDB;
 
     public RegistrarActor(ActorRef messageChannel) {
@@ -56,7 +56,8 @@ public class RegistrarActor  extends AbstractActor {
                     }
                     log.debug(String.format(">>\n%s", response.encode()));
                     messageChannel.tell(response, getSelf());
-                    getSender().tell(PoisonPill.getInstance(), getSelf());
+                    //messageChannel.tell(PoisonPill.getInstance(), getSelf());
+                    getSender().tell(new CallIdActor.KillReq(), getSelf());
                 }
             })
             .build();

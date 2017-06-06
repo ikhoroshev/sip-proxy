@@ -7,6 +7,13 @@
     <groupId>net.khoroshev</groupId>
     <artifactId>sip-proxy</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <repositories>
+        <repository>
+            <id>kamon-snapshots</id>
+            <name>kamon-snapshots</name>
+            <url>https://dl.bintray.com/kamon-io/snapshots/</url>
+        </repository>
+    </repositories>
     <build>
         <pluginManagement>
             <plugins>
@@ -90,6 +97,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_2.12</artifactId>
+            <version>${akka.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.iq80.leveldb</groupId>
             <artifactId>leveldb</artifactId>
             <version>0.7</version>
@@ -142,7 +155,7 @@
         <dependency>
             <groupId>io.kamon</groupId>
             <artifactId>kamon-akka-2.4_2.12</artifactId>
-            <version>0.6.6</version>
+            <version>0.6.7-4ebfcb4a0588c886bd418917451ed0703027a409</version>
         </dependency>
         <dependency>
             <groupId>io.kamon</groupId>

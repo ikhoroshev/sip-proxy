@@ -31,10 +31,8 @@ import java.util.concurrent.CompletionStage;
  * Created by sbt-khoroshev-iv on 26/05/17.
  */
 public class HTTPTransportJ extends AbstractActor implements Transport{
-    private final List<ActorRef> nextActors;
 
-    private HTTPTransportJ(List<ActorRef> nextActors) {
-        this.nextActors = nextActors;
+    private HTTPTransportJ() {
     }
 
     @Override
@@ -46,34 +44,36 @@ public class HTTPTransportJ extends AbstractActor implements Transport{
         }).build();
     }
 
-    public static ActorRef getInstance(ActorSystem system, Config conf) {
+    public static ActorRef getInstance(ActorSystem system, Config conf, List<ActorRef> sipSystems) {
         HTTPTransportJ instance;
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
         //In order to access all directives we need an instance where the routes are define.
-        App app = new App(system, conf);
+        App app = new App(system, conf, sipSystems);
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost(conf.getString("http.bindAddress"), conf.getInt("http.bindPort")), materializer);
 
-        return system.actorOf(Props.create(HTTPTransportJ.class, Arrays.asList(system.actorOf(Props.create(Echo.class)))), conf.getString("name")) ;
+        return system.actorOf(Props.create(HTTPTransportJ.class), conf.getString("name")) ;
     }
     private static class App extends AllDirectives {
         private final ActorSystem system;
         private final Config conf;
+        private final List<ActorRef> sipSystems;
 
-        private App(ActorSystem system, Config conf) {
+        private App(ActorSystem system, Config conf, List<ActorRef> sipSystems) {
             this.system = system;
             this.conf = conf;
+            this.sipSystems = sipSystems;
         }
 
-        public Route createRoute() {
+        Route createRoute() {
             return route(
                 path("hello", () ->
                         get(() ->
                                 complete("<h1>Say hello to akka-http</h1>"))),
-                path("sip", () -> this.<NotUsed>handleWebSocketMessagesForOptionalProtocol(sipFlow(), Optional.of("sip"))),
+                path("sip", () -> this.handleWebSocketMessagesForOptionalProtocol(sipFlow(), Optional.of("sip"))),
 
                 /*entity(as[HttpRequest]) { requestData =>
                 complete {
@@ -90,7 +90,7 @@ public class HTTPTransportJ extends AbstractActor implements Transport{
         }
 
         private Flow<Message, Message, NotUsed> sipFlow() {
-            ActorRef client = system.actorOf(Props.create(Echo.class));//(Props(classOf[Echo]));
+            ActorRef client = system.actorOf(Props.create(WSChannel.class, sipSystems));//(Props(classOf[Echo]));
             Sink<Message, NotUsed> in = Sink.actorRef(client, "sinkclose");
             Source<Message, ActorRef> actorSource = Source.actorRef(8, OverflowStrategy.fail());
             Source<Message, ActorRef> out = actorSource.mapMaterializedValue((a) -> {

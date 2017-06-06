@@ -40,10 +40,7 @@ public class Launcher {
         someHistogram.record(50);
         someCounter.increment();
 
-        system.registerOnTermination(()->{
-            // This application wont terminate unless you shutdown Kamon.
-            Kamon.shutdown();
-        });
+        system.registerOnTermination(Kamon::shutdown);
 
     }
 
@@ -61,7 +58,7 @@ public class Launcher {
     private static ActorRef makeWsTransport(Config conf, ActorSystem system, List<ActorRef> sipSystems) {
         ActorRef result = null;
         if (conf.hasPath("websocket")) {
-            result = HTTPTransportJ.getInstance(system, conf.getConfig("websocket"));
+            result = HTTPTransportJ.getInstance(system, conf.getConfig("websocket"), sipSystems);
         }
         return result;
     }

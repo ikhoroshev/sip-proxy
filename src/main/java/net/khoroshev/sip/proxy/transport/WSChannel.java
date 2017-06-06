@@ -2,6 +2,7 @@ package net.khoroshev.sip.proxy.transport;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.http.javadsl.model.ws.TextMessage;
 import akka.io.Udp;
 import akka.io.UdpMessage;
 import akka.util.ByteString;
@@ -19,30 +20,28 @@ import java.util.Set;
  * Created by sbt-khoroshev-iv on 26/05/17.
  */
 public class WSChannel extends AbstractActor implements Channel {
-    private final ActorRef socket;
+    private ActorRef socket;
     private final List<ActorRef> sipSystems;
     private final Set<ActorRef> subscribers = new HashSet<>();
-    private InetSocketAddress address;
 
-    public WSChannel(ActorRef socket, List<ActorRef> sipSystems) {
-        this.socket = socket;
+    public WSChannel(List<ActorRef> sipSystems) {
         this.sipSystems = sipSystems;
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Udp.Received.class, r -> {
-                    if (address == null) {
-                        address = r.sender();
-                    }
+                .match(TextMessage.class, m -> {
                     StringMsgParser smp = new StringMsgParser();
-                    SIPMessage sipMessage = null;
+                    if (socket == null) {
+                        socket = getSender();
+                    }
+                    SIPMessage sipMessage;
                     try {
-                        sipMessage = smp.parseSIPMessage(r.data().toArray(), true, false, null);
+                        sipMessage = smp.parseSIPMessage(m.getStrictText().getBytes(), true, false, null);
                     } catch (ParseException e) {
                         //echo
-                        socket.tell(UdpMessage.send(r.data(), address), getSelf());
+                        socket.tell(TextMessage.create(m.getStrictText()), getSelf());
                         return;
                     }
                     if (sipMessage instanceof SIPRequest) {
@@ -65,8 +64,7 @@ public class WSChannel extends AbstractActor implements Channel {
                 })
                 .match(SIPMessage.class, m -> { //from sip system
                     String payload = m.encode();
-                    ActorRef parent = getContext().getParent();
-                    parent.tell(UdpMessage.send(ByteString.fromString(payload), address), getSelf());
+                    socket.tell(TextMessage.create(payload), getSelf());
                 })
                 .match(UnsubscribeReq.class, u -> {
                     sipSystems.remove(getSender());

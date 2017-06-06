@@ -2,6 +2,7 @@ package net.khoroshev.sip.proxy;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.PoisonPill;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -14,7 +15,7 @@ import javax.sip.message.Request;
  * Created by sbt-khoroshev-iv on 25/05/17.
  */
 public class CSeqActor extends AbstractActor {
-    LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+    private LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private ActorRef messageChannel;
     private ActorRef children;
 
@@ -34,6 +35,10 @@ public class CSeqActor extends AbstractActor {
             } else {
                 log.error("Unexpected message. " + r.encode());
             }
+        })
+        .match(CallIdActor.KillReq.class, m -> {
+            getContext().getParent().tell(m, getSelf());
+            //getSelf().tell(PoisonPill.getInstance(), getSelf());
         }).build();
     }
 
